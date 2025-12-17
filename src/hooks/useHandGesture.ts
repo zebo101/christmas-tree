@@ -95,6 +95,7 @@ export function useHandGesture({ enabled, onGestureChange }: UseHandGestureOptio
       const pinchDistance = calculateFingerDistance(landmarks, 4, 8);
 
       if (gesture !== lastGestureRef.current) {
+        console.log('[Gesture] Detected gesture:', gesture);
         lastGestureRef.current = gesture;
         onGestureChange?.(gesture);
       }
@@ -106,11 +107,16 @@ export function useHandGesture({ enabled, onGestureChange }: UseHandGestureOptio
         isTracking: true,
       });
     } else {
-      setState(prev => ({
-        ...prev,
-        isTracking: false,
-        handPosition: null,
-      }));
+      setState(prev => {
+        if (prev.isTracking) {
+          console.log('[Gesture] Hand lost');
+        }
+        return {
+          ...prev,
+          isTracking: false,
+          handPosition: null,
+        };
+      });
     }
   }, [detectGesture, calculateFingerDistance, onGestureChange]);
 
@@ -147,8 +153,8 @@ export function useHandGesture({ enabled, onGestureChange }: UseHandGestureOptio
         hands.setOptions({
           maxNumHands: 1,
           modelComplexity: 1,
-          minDetectionConfidence: 0.7,
-          minTrackingConfidence: 0.5,
+          minDetectionConfidence: 0.5,  // Lowered from 0.7
+          minTrackingConfidence: 0.3,   // Lowered from 0.5
         });
 
         hands.onResults(onResults);
