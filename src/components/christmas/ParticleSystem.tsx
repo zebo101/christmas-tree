@@ -145,11 +145,11 @@ export function ParticleSystem({ state, particleCount = 2500 }: ParticleSystemPr
     <instancedMesh ref={meshRef} args={[undefined, undefined, particleCount]}>
       <sphereGeometry args={[1, 12, 12]} />
       <meshStandardMaterial
-        metalness={0.3}
-        roughness={0.2}
-        emissive={new THREE.Color('#ff4444')}
-        emissiveIntensity={0.8}
+        metalness={0.4}
+        roughness={0.3}
+        emissiveIntensity={0.5}
         toneMapped={false}
+        vertexColors
       />
     </instancedMesh>
   );
