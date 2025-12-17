@@ -59,20 +59,36 @@ export function GestureIndicator({
     );
   }
 
-  // Show denied state
+  // Show denied state with reset instructions
   if (cameraPermission === 'denied') {
     return (
       <div className="absolute top-4 left-4 z-10">
-        <div className="glass-gold rounded-xl px-4 py-3 flex items-center gap-3 text-foreground">
-          <div className="p-2 rounded-lg bg-christmas-red/30 text-christmas-red">
-            <AlertCircle className="w-5 h-5" />
+        <div className="glass-gold rounded-xl px-4 py-3 flex flex-col gap-2 text-foreground max-w-xs">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-christmas-red/30 text-christmas-red">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-sm font-medium">摄像头权限被拒绝</span>
+              <span className="text-xs text-muted-foreground">
+                使用鼠标双击切换模式
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col items-start">
-            <span className="text-sm font-medium">摄像头权限被拒绝</span>
-            <span className="text-xs text-muted-foreground">
-              使用鼠标双击切换模式
-            </span>
+          <div className="text-xs text-muted-foreground bg-black/20 rounded-lg p-2">
+            <p className="font-medium mb-1">如何重新启用：</p>
+            <ol className="list-decimal list-inside space-y-0.5">
+              <li>点击地址栏左边的🔒图标</li>
+              <li>将摄像头设为"允许"</li>
+              <li>刷新页面</li>
+            </ol>
           </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-xs bg-christmas-gold/20 hover:bg-christmas-gold/30 rounded-lg py-1.5 transition-colors"
+          >
+            刷新页面重试
+          </button>
         </div>
       </div>
     );
