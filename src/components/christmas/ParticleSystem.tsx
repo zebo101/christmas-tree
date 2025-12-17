@@ -52,28 +52,23 @@ export function ParticleSystem({ state, particleCount = 2500 }: ParticleSystemPr
       const treePos = generateTreePosition(i, particleCount);
       const galaxyPos = generateGalaxyPosition();
       
-// Classic Red & Green alternating pattern: 45% green, 45% red, 10% gold/white sparkles
+// Classic Christmas: 50% green, 35% red, 10% gold, 5% white
       const colorRand = Math.random();
       let color: THREE.Color;
       
-      // Alternating based on index for striped effect
-      const isGreenLayer = (i % 2 === 0);
-      
-      if (colorRand < 0.8) {
-        // Main alternating colors
-        if (isGreenLayer) {
-          // Bright emerald green
-          color = new THREE.Color().setHSL(0.35 + Math.random() * 0.05, 1, 0.45 + Math.random() * 0.15);
-        } else {
-          // Vibrant Christmas red
-          color = new THREE.Color().setHSL(0, 1, 0.5 + Math.random() * 0.1);
-        }
+      if (colorRand < 0.50) {
+        // Rich Christmas GREEN - primary color
+        const hue = 0.33 + Math.random() * 0.05; // Green hue range
+        color = new THREE.Color().setHSL(hue, 0.85 + Math.random() * 0.15, 0.35 + Math.random() * 0.15);
+      } else if (colorRand < 0.85) {
+        // Vibrant Christmas RED
+        color = new THREE.Color().setHSL(0, 0.9 + Math.random() * 0.1, 0.45 + Math.random() * 0.1);
       } else if (colorRand < 0.95) {
         // Sparkling gold accents
-        color = new THREE.Color().setHSL(0.12, 1, 0.6 + Math.random() * 0.2);
+        color = new THREE.Color().setHSL(0.12 + Math.random() * 0.03, 1, 0.55 + Math.random() * 0.15);
       } else {
         // White twinkles
-        color = new THREE.Color().setHSL(0, 0, 1);
+        color = new THREE.Color().setHSL(0, 0, 0.95 + Math.random() * 0.05);
       }
       
       return {

@@ -167,15 +167,11 @@ function PhotoCardMesh({
   return (
     <mesh ref={meshRef} position={treePosition} scale={[0.5, 0.5, 1]}>
       <planeGeometry args={[1, 1]} />
-      <meshStandardMaterial 
+      <meshBasicMaterial 
         map={texture} 
         side={THREE.DoubleSide}
-        transparent
-        opacity={isFocused ? 1 : 0.95}
-        emissive={new THREE.Color('#ffffff')}
-        emissiveIntensity={isFocused ? 0.3 : 0.15}
-        roughness={0.3}
-        metalness={0.1}
+        transparent={false}
+        toneMapped={false}
       />
     </mesh>
   );
