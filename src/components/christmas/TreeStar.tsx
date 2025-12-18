@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { TreeState } from '@/types/christmas';
@@ -7,7 +7,7 @@ interface TreeStarProps {
   state: TreeState;
 }
 
-// Create a 5-pointed star shape
+// Create a refined 5-pointed star shape with sharp, elegant points
 function createStarShape(outerRadius: number, innerRadius: number): THREE.Shape {
   const shape = new THREE.Shape();
   const points = 5;
@@ -28,95 +28,30 @@ function createStarShape(outerRadius: number, innerRadius: number): THREE.Shape 
   return shape;
 }
 
-// Sparkle particles around the star - OPTIMIZED
-function StarSparkles({ visible }: { visible: boolean }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const timeRef = useRef(0);
-  const colorsSetRef = useRef(false);
-  const sparkleCount = 30;
-  
-  // Pre-create colors
-  const colors = useMemo(() => ({
-    gold: new THREE.Color('#ffd700'),
-    white: new THREE.Color('#ffffff'),
-  }), []);
-  
-  const sparkleData = useMemo(() => {
-    return Array.from({ length: sparkleCount }, (_, i) => ({
-      angle: (i / sparkleCount) * Math.PI * 2,
-      radius: 0.4 + Math.random() * 0.8,
-      speed: 1 + Math.random() * 2,
-      phase: Math.random() * Math.PI * 2,
-      yOffset: (Math.random() - 0.5) * 0.6,
-      scale: 0.02 + Math.random() * 0.03,
-      isWhite: i % 3 === 0,
-    }));
-  }, []);
-
-  // Set colors once
-  useEffect(() => {
-    if (!meshRef.current || colorsSetRef.current) return;
-    sparkleData.forEach((sparkle, i) => {
-      meshRef.current!.setColorAt(i, sparkle.isWhite ? colors.white : colors.gold);
-    });
-    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
-    colorsSetRef.current = true;
-  }, [sparkleData, colors]);
-
-  useFrame((_, delta) => {
-    if (!meshRef.current || !visible) return;
-    
-    timeRef.current += delta;
-    
-    sparkleData.forEach((sparkle, i) => {
-      const t = timeRef.current * sparkle.speed + sparkle.phase;
-      const currentAngle = sparkle.angle + t * 0.5;
-      const pulseRadius = sparkle.radius + Math.sin(t * 2) * 0.2;
-      
-      const x = Math.cos(currentAngle) * pulseRadius;
-      const y = sparkle.yOffset + Math.sin(t * 3) * 0.15;
-      const z = Math.sin(currentAngle) * pulseRadius;
-      
-      dummy.position.set(x, 4.5 + y, z);
-      
-      const pulseScale = sparkle.scale * (0.5 + Math.abs(Math.sin(t * 4)) * 0.5);
-      dummy.scale.setScalar(pulseScale);
-      dummy.rotation.set(t, t * 1.5, t * 0.7);
-      
-      dummy.updateMatrix();
-      meshRef.current!.setMatrixAt(i, dummy.matrix);
-    });
-    
-    meshRef.current.instanceMatrix.needsUpdate = true;
-  });
-
-  return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, sparkleCount]}>
-      <octahedronGeometry args={[1, 0]} />
-      <meshBasicMaterial toneMapped={false} transparent opacity={visible ? 1 : 0} />
-    </instancedMesh>
-  );
-}
-
 export function TreeStar({ state }: TreeStarProps) {
   const groupRef = useRef<THREE.Group>(null);
   const starRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
-  const haloRef = useRef<THREE.Mesh>(null);
+  const innerGlowRef = useRef<THREE.Mesh>(null);
+  const outerGlowRef = useRef<THREE.Mesh>(null);
+  const raysRef = useRef<THREE.Group>(null);
   const timeRef = useRef(0);
 
-  // Create thin extruded star geometry
+  // Create ultra-thin extruded star geometry - more refined proportions
   const starGeometry = useMemo(() => {
-    const shape = createStarShape(0.35, 0.14);
+    const shape = createStarShape(0.28, 0.11); // Sharper, more elegant proportions
     const extrudeSettings = {
-      depth: 0.03,
+      depth: 0.015, // Much thinner
       bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.01,
-      bevelSegments: 2,
+      bevelThickness: 0.005,
+      bevelSize: 0.005,
+      bevelSegments: 1,
     };
     return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  }, []);
+
+  // Create subtle light rays
+  const rayGeometry = useMemo(() => {
+    return new THREE.PlaneGeometry(0.02, 0.6);
   }, []);
 
   useFrame((_, delta) => {
@@ -124,33 +59,47 @@ export function TreeStar({ state }: TreeStarProps) {
     
     timeRef.current += delta;
     
-    // Rotate the star elegantly
+    // Gentle, elegant rotation
     if (starRef.current) {
-      starRef.current.rotation.z += delta * 0.3;
-      starRef.current.rotation.y = Math.sin(timeRef.current * 0.5) * 0.2;
+      starRef.current.rotation.z += delta * 0.15;
+      starRef.current.rotation.y = Math.sin(timeRef.current * 0.3) * 0.1;
     }
     
-    // Pulsing glow halos
-    if (glowRef.current) {
-      const pulse = 1 + Math.sin(timeRef.current * 2) * 0.15;
-      glowRef.current.scale.setScalar(pulse);
+    // Subtle pulsing glow
+    const glowPulse = 0.9 + Math.sin(timeRef.current * 1.5) * 0.1;
+    
+    if (innerGlowRef.current) {
+      innerGlowRef.current.scale.setScalar(glowPulse);
+      const mat = innerGlowRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = state === 'tree' ? 0.3 * glowPulse : 0;
     }
     
-    if (haloRef.current) {
-      const pulse2 = 1.2 + Math.sin(timeRef.current * 1.5 + 1) * 0.2;
-      haloRef.current.scale.setScalar(pulse2);
-      haloRef.current.rotation.z -= delta * 0.2;
+    if (outerGlowRef.current) {
+      const outerPulse = 1 + Math.sin(timeRef.current * 1.2 + 0.5) * 0.15;
+      outerGlowRef.current.scale.setScalar(outerPulse);
+      const mat = outerGlowRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = state === 'tree' ? 0.15 * outerPulse : 0;
+    }
+
+    // Animate light rays
+    if (raysRef.current) {
+      raysRef.current.rotation.z -= delta * 0.08;
+      raysRef.current.children.forEach((ray, i) => {
+        const mesh = ray as THREE.Mesh;
+        const mat = mesh.material as THREE.MeshBasicMaterial;
+        const rayPulse = 0.5 + Math.sin(timeRef.current * 2 + i * 0.8) * 0.5;
+        mat.opacity = state === 'tree' ? 0.12 * rayPulse : 0;
+      });
     }
 
     // Position based on state
     const targetY = state === 'tree' ? 4.5 : 10;
-    const targetOpacity = state === 'tree' ? 1 : 0;
-    
     groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.05;
     
-    // Fade materials
+    // Fade star material
     if (starRef.current) {
       const mat = starRef.current.material as THREE.MeshStandardMaterial;
+      const targetOpacity = state === 'tree' ? 1 : 0;
       mat.opacity += (targetOpacity - mat.opacity) * 0.05;
     }
   });
@@ -159,49 +108,65 @@ export function TreeStar({ state }: TreeStarProps) {
 
   return (
     <group ref={groupRef} position={[0, 4.5, 0]}>
-      {/* Main 5-pointed star */}
+      {/* Subtle light rays emanating from center */}
+      <group ref={raysRef}>
+        {[...Array(8)].map((_, i) => (
+          <mesh 
+            key={i} 
+            geometry={rayGeometry}
+            rotation={[0, 0, (i / 8) * Math.PI * 2]}
+            position={[0, 0, -0.02]}
+          >
+            <meshBasicMaterial
+              color="#fff8e0"
+              transparent
+              opacity={isVisible ? 0.1 : 0}
+              depthWrite={false}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Outer soft glow */}
+      <mesh ref={outerGlowRef}>
+        <circleGeometry args={[0.7, 32]} />
+        <meshBasicMaterial
+          color="#fff5d4"
+          transparent
+          opacity={isVisible ? 0.12 : 0}
+          depthWrite={false}
+        />
+      </mesh>
+      
+      {/* Inner concentrated glow */}
+      <mesh ref={innerGlowRef}>
+        <circleGeometry args={[0.35, 32]} />
+        <meshBasicMaterial
+          color="#ffd700"
+          transparent
+          opacity={isVisible ? 0.25 : 0}
+          depthWrite={false}
+        />
+      </mesh>
+      
+      {/* Main refined 5-pointed star */}
       <mesh 
         ref={starRef} 
         geometry={starGeometry}
         rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, -0.015]}
+        position={[0, 0, -0.008]}
       >
         <meshStandardMaterial
-          color="#ffd700"
-          emissive="#ffaa00"
-          emissiveIntensity={3}
-          metalness={1}
-          roughness={0.1}
+          color="#ffeaa0"
+          emissive="#ffd700"
+          emissiveIntensity={2}
+          metalness={0.95}
+          roughness={0.05}
           transparent
           opacity={1}
         />
       </mesh>
-      
-      {/* Inner glow */}
-      <mesh ref={glowRef}>
-        <sphereGeometry args={[0.5, 16, 16]} />
-        <meshBasicMaterial
-          color="#ffd700"
-          transparent
-          opacity={isVisible ? 0.4 : 0}
-          depthWrite={false}
-        />
-      </mesh>
-      
-      {/* Outer halo ring */}
-      <mesh ref={haloRef} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.6, 0.8, 32]} />
-        <meshBasicMaterial
-          color="#ffee88"
-          transparent
-          opacity={isVisible ? 0.25 : 0}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      
-      {/* Dynamic sparkles */}
-      <StarSparkles visible={isVisible} />
     </group>
   );
 }
