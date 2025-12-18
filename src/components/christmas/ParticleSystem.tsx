@@ -236,7 +236,7 @@ export function GiftBoxes({ state }: { state: TreeState }) {
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const colorsSetRef = useRef({ box: false, ribbon: false });
   const transitionRef = useRef({ progress: 0 });
-  const giftCount = 35;
+  const giftCount = 15;
   
   const giftData = useMemo(() => {
     const colors = [
@@ -252,7 +252,7 @@ export function GiftBoxes({ state }: { state: TreeState }) {
       galaxyPosition: generateGalaxyPosition(),
       color: colors[i % colors.length],
       ribbonColor: new THREE.Color('#FFD700'), // Gold ribbon
-      scale: 0.12 + Math.random() * 0.06,
+      scale: 0.22 + Math.random() * 0.1,
       rotation: Math.random() * Math.PI * 2,
       delay: Math.random(),
     }));
