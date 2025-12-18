@@ -396,21 +396,21 @@ export function GemOrnaments({ state }: { state: TreeState }) {
       <instancedMesh ref={cubeRef} args={[undefined, undefined, cubeCount]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial 
-          color="#e8e0f0"
-          emissive="#9080b0"
-          emissiveIntensity={0.6}
-          metalness={0.8} 
-          roughness={0.15}
+          color="#ffffff"
+          emissive="#d0d8e0"
+          emissiveIntensity={0.8}
+          metalness={0.9} 
+          roughness={0.1}
         />
       </instancedMesh>
       <instancedMesh ref={icoRef} args={[undefined, undefined, icoCount]}>
         <icosahedronGeometry args={[1, 0]} />
         <meshStandardMaterial 
-          color="#f0e8f8"
-          emissive="#a090c0"
-          emissiveIntensity={0.6}
-          metalness={0.8} 
-          roughness={0.15}
+          color="#ffffff"
+          emissive="#e0e8f0"
+          emissiveIntensity={0.8}
+          metalness={0.9} 
+          roughness={0.1}
         />
       </instancedMesh>
     </>
