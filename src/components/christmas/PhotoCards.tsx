@@ -173,7 +173,7 @@ function PhotoCardMesh({
   const roundedRectGeometry = useMemo(() => {
     const width = 1;
     const height = 1;
-    const radius = 0.13; // 圆角半径
+    const radius = 0.1; // 圆角半径
     
     const shape = new THREE.Shape();
     shape.moveTo(-width/2 + radius, -height/2);
