@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Stars, Environment } from '@react-three/drei';
+import { OrbitControls, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { ParticleSystem, OrnamentBalls, GemOrnaments, TetrahedronSpiral } from './ParticleSystem';
@@ -77,8 +77,10 @@ function SceneContent({
         handPosition={handPosition}
       />
       
-      {/* Environment for reflections - use minimal setup to avoid external HDR loading */}
-      <Environment preset="night" />
+      {/* 
+        Remove Environment component entirely - it loads HDR from raw.githack.com which is blocked in China.
+        Use enhanced lighting instead for reflections.
+      */}
       
       {/* Ambient lighting - subtle */}
       <ambientLight intensity={0.15} />
