@@ -356,20 +356,20 @@ export function GemOrnaments({ state }: { state: TreeState }) {
   );
 }
 
-// Tetrahedron spiral ribbon (minimalist, elegant)
+// Tetrahedron spiral ribbon (minimalist, elegant) - 3 loops around tree
 export function TetrahedronSpiral({ state }: { state: TreeState }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const timeRef = useRef(0);
-  const tetraCount = 120; // 3 spirals, ~40 per spiral
+  const tetraCount = 180; // More tetrahedrons for smoother spiral
   
   const tetraData = useMemo(() => {
     return Array.from({ length: tetraCount }, (_, i) => {
-      const height = 7.5;
-      const maxRadius = 3.2;
+      const height = 7;
+      const maxRadius = 3.0;
       const t = i / tetraCount;
-      const y = t * height - height / 2;
-      const layerRadius = maxRadius * (1 - t * 0.92);
+      const y = t * height - height / 2 + 0.3;
+      const layerRadius = maxRadius * (1 - t * 0.88) + 0.15; // Slightly offset from tree surface
       const angle = t * Math.PI * 6; // 3 full spirals
       
       const treePos: [number, number, number] = [
@@ -402,7 +402,7 @@ export function TetrahedronSpiral({ state }: { state: TreeState }) {
         2: targetPositions[i][2],
         duration: 1.3 + Math.random() * 0.4,
         ease: 'power2.inOut',
-        delay: Math.random() * 0.2,
+        delay: i * 0.005, // Sequential delay for wave effect
       });
     });
   }, [state, tetraData]);
@@ -417,9 +417,10 @@ export function TetrahedronSpiral({ state }: { state: TreeState }) {
       const pos = positionsRef.current[i];
       
       dummy.position.set(pos[0], pos[1], pos[2]);
-      dummy.rotation.y = tetra.angle + timeRef.current * 0.3;
-      dummy.rotation.x = Math.PI * 0.1;
-      dummy.scale.setScalar(0.04); // Tiny tetrahedrons
+      dummy.rotation.y = tetra.angle + timeRef.current * 0.2;
+      dummy.rotation.x = Math.PI * 0.15;
+      dummy.rotation.z = tetra.angle * 0.5;
+      dummy.scale.setScalar(0.06); // Visible but elegant size
       
       dummy.updateMatrix();
       meshRef.current!.setMatrixAt(i, dummy.matrix);
@@ -434,9 +435,12 @@ export function TetrahedronSpiral({ state }: { state: TreeState }) {
     <instancedMesh ref={meshRef} args={[undefined, undefined, tetraCount]}>
       <tetrahedronGeometry args={[1, 0]} />
       <meshStandardMaterial 
-        metalness={0.9}
-        roughness={0.1}
-        envMapIntensity={1.5}
+        color="#ffffff"
+        emissive="#ffffff"
+        emissiveIntensity={0.3}
+        metalness={0.95}
+        roughness={0.05}
+        envMapIntensity={2}
       />
     </instancedMesh>
   );
