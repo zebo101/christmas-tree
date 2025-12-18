@@ -264,32 +264,13 @@ export function useHandGesture({ enabled, onGestureChange }: UseHandGestureOptio
         setStatus('initializing-hands');
         console.log('[Gesture] Video playing, dimensions:', video.videoWidth, 'x', video.videoHeight, 'readyState:', video.readyState);
 
-        // Initialize Hands with China-friendly CDN fallback for model files
-        const modelCdnSources = [
-          'https://cdn.bootcdn.net/ajax/libs/mediapipe/0.4.1675469240',
-          'https://cdn.staticfile.org/mediapipe/0.4.1675469240',
-          'https://cdn.jsdelivr.net/npm/@mediapipe/hands',
-        ];
-        
-        // Test which CDN works for model files
-        let workingModelCdn = modelCdnSources[0];
-        for (const cdn of modelCdnSources) {
-          try {
-            const testUrl = `${cdn}/hands_solution_packed_assets.data`;
-            const response = await fetch(testUrl, { method: 'HEAD', mode: 'cors' });
-            if (response.ok) {
-              workingModelCdn = cdn;
-              console.log('[Gesture] Using model CDN:', cdn);
-              break;
-            }
-          } catch (e) {
-            console.warn('[Gesture] Model CDN failed:', cdn);
-          }
-        }
+        // Initialize Hands - use jsdelivr as primary (most reliable for mediapipe)
+        // China users may be slower but it should still work
+        const modelCdnBase = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands';
         
         const hands = new Hands({
           locateFile: (file: string) => {
-            return `${workingModelCdn}/${file}`;
+            return `${modelCdnBase}/${file}`;
           },
         });
 
