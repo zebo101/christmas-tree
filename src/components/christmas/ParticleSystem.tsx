@@ -239,23 +239,29 @@ export function GiftBoxes({ state }: { state: TreeState }) {
   const giftCount = 15;
   
   const giftData = useMemo(() => {
-    const colors = [
-      new THREE.Color('#C41E3A'), // Christmas red
-      new THREE.Color('#8B0000'), // Dark red
-      new THREE.Color('#DC143C'), // Crimson
-      new THREE.Color('#B22222'), // Fire brick
-      new THREE.Color('#FF0000'), // Red
+    const giftStyles = [
+      { box: '#C41E3A', ribbon: '#FFD700' },  // Red + Gold
+      { box: '#228B22', ribbon: '#FF0000' },  // Green + Red
+      { box: '#FFD700', ribbon: '#C41E3A' },  // Gold + Red
+      { box: '#1E90FF', ribbon: '#FFFFFF' },  // Blue + White
+      { box: '#8B0000', ribbon: '#FFD700' },  // Dark red + Gold
+      { box: '#006400', ribbon: '#FFD700' },  // Dark green + Gold
+      { box: '#C0C0C0', ribbon: '#FF0000' },  // Silver + Red
+      { box: '#FF6347', ribbon: '#228B22' },  // Tomato + Green
     ];
     
-    return Array.from({ length: giftCount }, (_, i) => ({
-      treePosition: generateOrnamentPosition(i, giftCount),
-      galaxyPosition: generateGalaxyPosition(),
-      color: colors[i % colors.length],
-      ribbonColor: new THREE.Color('#FFD700'), // Gold ribbon
-      scale: 0.22 + Math.random() * 0.1,
-      rotation: Math.random() * Math.PI * 2,
-      delay: Math.random(),
-    }));
+    return Array.from({ length: giftCount }, (_, i) => {
+      const style = giftStyles[i % giftStyles.length];
+      return {
+        treePosition: generateOrnamentPosition(i, giftCount),
+        galaxyPosition: generateGalaxyPosition(),
+        color: new THREE.Color(style.box),
+        ribbonColor: new THREE.Color(style.ribbon),
+        scale: 0.22 + Math.random() * 0.1,
+        rotation: Math.random() * Math.PI * 2,
+        delay: Math.random(),
+      };
+    });
   }, []);
 
   const isTransitioningRef = useRef(false);
