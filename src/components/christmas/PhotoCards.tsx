@@ -5,29 +5,49 @@ import gsap from 'gsap';
 import { TreeState, PhotoCard } from '@/types/christmas';
 import { RoundedBox } from '@react-three/drei';
 
-// Default placeholder images - higher resolution for clarity
-const DEFAULT_PHOTOS = [
-  'https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1544826252-a8f669ffe4bd?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1479722842840-c0a823bd0cd6?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1545622783-b3e021430fee?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1513297887119-d46091b24bfa?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1418489098061-ce87b5dc3aee?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1514803530614-3d6e0bd66c63?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1481286943471-1f233f26c56b?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1512474932049-78ac69ede12c?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1485083269755-a7b559a4fe5e?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1482330454287-4e2c1bb3e9dd?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1513297887119-d46091b24bfa?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1481586542890-a17ed8a1d6f0?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1515266591878-f93e32bc5937?w=400&h=400&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1483808161634-ce6ed94ec53d?w=400&h=400&fit=crop&q=80',
-];
+// Generate local placeholder images (avoid external CDN for China users)
+const generatePlaceholder = (index: number): string => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 400;
+  canvas.height = 400;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    // Create festive gradient backgrounds
+    const gradients = [
+      ['#c41e3a', '#8b0000'], // Christmas red
+      ['#228b22', '#006400'], // Forest green
+      ['#ffd700', '#daa520'], // Gold
+      ['#1e90ff', '#0066cc'], // Blue
+      ['#ff69b4', '#ff1493'], // Pink
+      ['#9932cc', '#663399'], // Purple
+      ['#ff6347', '#ff4500'], // Coral
+      ['#20b2aa', '#008b8b'], // Teal
+    ];
+    const [color1, color2] = gradients[index % gradients.length];
+    const gradient = ctx.createLinearGradient(0, 0, 400, 400);
+    gradient.addColorStop(0, color1);
+    gradient.addColorStop(1, color2);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 400, 400);
+    
+    // Add festive emoji
+    const emojis = ['🎄', '⭐', '🎁', '❄️', '🔔', '🎅', '🦌', '🕯️', '🍪', '🧦'];
+    ctx.font = '120px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emojis[index % emojis.length], 200, 200);
+  }
+  return canvas.toDataURL('image/png');
+};
+
+// Pre-generate placeholders (only generate once)
+let cachedPlaceholders: string[] | null = null;
+const getDefaultPhotos = (): string[] => {
+  if (!cachedPlaceholders) {
+    cachedPlaceholders = Array.from({ length: 20 }, (_, i) => generatePlaceholder(i));
+  }
+  return cachedPlaceholders;
+};
 
 interface PhotoCardsProps {
   state: TreeState;
@@ -224,7 +244,7 @@ function PhotoCardMesh({
 }
 
 export function PhotoCards({ state, photos, focusedIndex, onFocusChange }: PhotoCardsProps) {
-  const photoUrls = photos && photos.length > 0 ? photos : DEFAULT_PHOTOS;
+  const photoUrls = photos && photos.length > 0 ? photos : getDefaultPhotos();
   
   const photoData = useMemo(() => {
     return photoUrls.slice(0, 20).map((url, i) => ({

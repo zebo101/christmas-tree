@@ -133,7 +133,8 @@ export function useHandGesture({ enabled, onGestureChange }: UseHandGestureOptio
         console.log('[Gesture] Starting MediaPipe initialization...');
         
         // Load MediaPipe Hands from CDN via script tag to avoid bundling issues
-        const loadScript = (src: string): Promise<void> => {
+        // Use multiple CDN sources with fallback for China users
+        const loadScript = (src: string, timeout = 10000): Promise<void> => {
           return new Promise((resolve, reject) => {
             if (document.querySelector(`script[src="${src}"]`)) {
               resolve();
@@ -142,14 +143,47 @@ export function useHandGesture({ enabled, onGestureChange }: UseHandGestureOptio
             const script = document.createElement('script');
             script.src = src;
             script.crossOrigin = 'anonymous';
-            script.onload = () => resolve();
-            script.onerror = reject;
+            
+            const timeoutId = setTimeout(() => {
+              reject(new Error('Script load timeout'));
+            }, timeout);
+            
+            script.onload = () => {
+              clearTimeout(timeoutId);
+              resolve();
+            };
+            script.onerror = () => {
+              clearTimeout(timeoutId);
+              reject(new Error('Script load failed'));
+            };
             document.head.appendChild(script);
           });
         };
 
-        // Load MediaPipe Hands library from CDN
-        await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js');
+        // Try multiple CDN sources (primary + fallbacks)
+        const cdnSources = [
+          'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js',
+          'https://unpkg.com/@mediapipe/hands/hands.js',
+          'https://cdn.staticfile.org/mediapipe/0.4.1675469240/hands.min.js', // China CDN
+        ];
+        
+        let loaded = false;
+        for (const src of cdnSources) {
+          if (!mounted) return;
+          try {
+            console.log('[Gesture] Trying CDN:', src);
+            await loadScript(src, 8000);
+            loaded = true;
+            console.log('[Gesture] Successfully loaded from:', src);
+            break;
+          } catch (e) {
+            console.warn('[Gesture] Failed to load from:', src, e);
+          }
+        }
+
+        if (!loaded) {
+          throw new Error('无法加载手势识别库，请检查网络连接');
+        }
 
         if (!mounted) return;
 
@@ -230,9 +264,11 @@ export function useHandGesture({ enabled, onGestureChange }: UseHandGestureOptio
         console.log('[Gesture] Video playing, dimensions:', video.videoWidth, 'x', video.videoHeight, 'readyState:', video.readyState);
 
         // Initialize Hands
+        // Initialize Hands with fallback CDN for model files
+        const modelCdnBase = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands';
         const hands = new Hands({
           locateFile: (file: string) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            return `${modelCdnBase}/${file}`;
           },
         });
 

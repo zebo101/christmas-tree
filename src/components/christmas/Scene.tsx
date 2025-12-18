@@ -74,8 +74,8 @@ function SceneContent({
         handPosition={handPosition}
       />
       
-      {/* Environment for reflections */}
-      <Environment preset="city" />
+      {/* Environment for reflections - use minimal setup to avoid external HDR loading */}
+      <Environment preset="night" />
       
       {/* Ambient lighting - subtle */}
       <ambientLight intensity={0.15} />
@@ -160,6 +160,7 @@ interface ChristmasSceneProps {
   focusedPhotoIndex: number | null;
   orbitRotation: { x: number; y: number };
   handPosition: { x: number; y: number } | null;
+  onReady?: () => void;
 }
 
 export function ChristmasScene({ 
@@ -168,7 +169,15 @@ export function ChristmasScene({
   focusedPhotoIndex,
   orbitRotation,
   handPosition,
+  onReady,
 }: ChristmasSceneProps) {
+  // Call onReady after mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onReady?.();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [onReady]);
   return (
     <Canvas
       camera={{ position: [0, 2, 12], fov: 60 }}
