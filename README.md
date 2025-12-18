@@ -4,6 +4,8 @@
 这是一个的3d交互式圣诞树网页项目。
 
 **在线预览**: [https://christmas-tree.space/]
+<img width="1916" height="1347" alt="image" src="https://github.com/user-attachments/assets/b78a1cb8-a945-4cd3-882e-adab76218345" />
+
 
 ## 🛠 如何编辑和开发
 
