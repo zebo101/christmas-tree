@@ -240,14 +240,9 @@ export function GiftBoxes({ state }: { state: TreeState }) {
   
   const giftData = useMemo(() => {
     const giftStyles = [
-      { box: '#C41E3A', ribbon: '#FFD700' },  // Red + Gold
-      { box: '#228B22', ribbon: '#FF0000' },  // Green + Red
-      { box: '#FFD700', ribbon: '#C41E3A' },  // Gold + Red
-      { box: '#1E90FF', ribbon: '#FFFFFF' },  // Blue + White
-      { box: '#8B0000', ribbon: '#FFD700' },  // Dark red + Gold
-      { box: '#006400', ribbon: '#FFD700' },  // Dark green + Gold
-      { box: '#C0C0C0', ribbon: '#FF0000' },  // Silver + Red
-      { box: '#FF6347', ribbon: '#228B22' },  // Tomato + Green
+      { box: '#C41E3A', ribbon: '#FFD700' },  // Red box + Gold ribbon
+      { box: '#228B22', ribbon: '#C41E3A' },  // Green box + Red ribbon
+      { box: '#FFD700', ribbon: '#C41E3A' },  // Gold box + Red ribbon
     ];
     
     return Array.from({ length: giftCount }, (_, i) => {
