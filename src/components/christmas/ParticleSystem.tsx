@@ -77,48 +77,40 @@ function generateRibbonPosition(index: number, total: number): [number, number, 
   ];
 }
 
-// Main tree particles using THREE.Points for maximum performance
-export function ParticleSystem({ state, particleCount = 8000 }: ParticleSystemProps) {
-  const pointsRef = useRef<THREE.Points>(null);
+// Main tree particles using InstancedMesh for beautiful 3D spheres
+export function ParticleSystem({ state, particleCount = 7000 }: ParticleSystemProps) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
   const timeRef = useRef(0);
   const transitionRef = useRef({ progress: 0 });
+  const colorsSetRef = useRef(false);
   
   // Pre-compute all particle data
-  const { positions, colors, particleData } = useMemo(() => {
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
+  const particleData = useMemo(() => {
     const data: Array<{
       treePos: [number, number, number];
       galaxyPos: [number, number, number];
       phase: number;
       speed: number;
       delay: number;
-      size: number;
+      scale: number;
+      color: THREE.Color;
     }> = [];
     
     for (let i = 0; i < particleCount; i++) {
       const treePos = generateTreePosition(i, particleCount);
       const galaxyPos = generateGalaxyPosition();
       
-      // Set initial positions
-      positions[i * 3] = treePos[0];
-      positions[i * 3 + 1] = treePos[1];
-      positions[i * 3 + 2] = treePos[2];
-      
       // 85% green, 15% white sparkles
       const colorRand = Math.random();
+      let color: THREE.Color;
       if (colorRand < 0.85) {
         const hue = 0.33 + Math.random() * 0.05;
         const saturation = 0.7 + Math.random() * 0.3;
-        const lightness = 0.25 + Math.random() * 0.2;
-        const color = new THREE.Color().setHSL(hue, saturation, lightness);
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
+        const lightness = 0.35 + Math.random() * 0.25;
+        color = new THREE.Color().setHSL(hue, saturation, lightness);
       } else {
-        colors[i * 3] = 0.95;
-        colors[i * 3 + 1] = 0.95;
-        colors[i * 3 + 2] = 0.95;
+        color = new THREE.Color(0.95, 0.95, 0.95);
       }
       
       data.push({
@@ -127,16 +119,26 @@ export function ParticleSystem({ state, particleCount = 8000 }: ParticleSystemPr
         phase: Math.random() * Math.PI * 2,
         speed: 0.5 + Math.random() * 0.5,
         delay: Math.random(),
-        size: 2 + Math.random() * 3,
+        scale: 0.025 + Math.random() * 0.025, // Small 3D spheres
+        color,
       });
     }
     
-    return { positions, colors, particleData: data };
+    return data;
   }, [particleCount]);
+
+  // Set colors once
+  useEffect(() => {
+    if (!meshRef.current || colorsSetRef.current) return;
+    particleData.forEach((p, i) => meshRef.current!.setColorAt(i, p.color));
+    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
+    colorsSetRef.current = true;
+  }, [particleData]);
 
   // Track if transition is active
   const isTransitioningRef = useRef(false);
   const lastProgressRef = useRef(0);
+  const frameCountRef = useRef(0);
 
   // Single GSAP tween for transition
   useEffect(() => {
@@ -152,22 +154,19 @@ export function ParticleSystem({ state, particleCount = 8000 }: ParticleSystemPr
   }, [state]);
 
   useFrame((_, delta) => {
-    if (!pointsRef.current) return;
+    if (!meshRef.current) return;
     
     const progress = transitionRef.current.progress;
+    frameCountRef.current++;
     
-    // Skip heavy computation if not transitioning and progress hasn't changed
-    // Only update every 3rd frame for breathing animation when idle
+    // Skip heavy computation if not transitioning
     const isIdle = !isTransitioningRef.current && Math.abs(progress - lastProgressRef.current) < 0.001;
     lastProgressRef.current = progress;
     
     timeRef.current += delta;
     
-    // When idle, only update breathing animation every few frames
-    if (isIdle && Math.floor(timeRef.current * 30) % 3 !== 0) return;
-    
-    const positionAttr = pointsRef.current.geometry.attributes.position as THREE.BufferAttribute;
-    const posArray = positionAttr.array as Float32Array;
+    // When idle, only update breathing animation every 3rd frame
+    if (isIdle && frameCountRef.current % 3 !== 0) return;
     
     for (let i = 0; i < particleCount; i++) {
       const p = particleData[i];
@@ -181,51 +180,23 @@ export function ParticleSystem({ state, particleCount = 8000 }: ParticleSystemPr
       const y = p.treePos[1] + (p.galaxyPos[1] - p.treePos[1]) * smooth;
       const z = p.treePos[2] + (p.galaxyPos[2] - p.treePos[2]) * smooth;
       
-      // Subtle breathing - only when idle for performance
+      // Subtle breathing
       const breathe = Math.sin(timeRef.current * p.speed + p.phase) * 0.02;
       
-      posArray[i * 3] = x;
-      posArray[i * 3 + 1] = y + breathe;
-      posArray[i * 3 + 2] = z;
+      dummy.position.set(x, y + breathe, z);
+      dummy.scale.setScalar(p.scale);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(i, dummy.matrix);
     }
     
-    positionAttr.needsUpdate = true;
+    meshRef.current.instanceMatrix.needsUpdate = true;
   });
 
-  // Create sizes array for variable particle sizes
-  const sizes = useMemo(() => {
-    const arr = new Float32Array(particleCount);
-    for (let i = 0; i < particleCount; i++) {
-      arr[i] = particleData[i].size;
-    }
-    return arr;
-  }, [particleCount, particleData]);
-
   return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particleCount}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          count={particleCount}
-          array={colors}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.04}
-        vertexColors
-        transparent
-        opacity={0.9}
-        sizeAttenuation
-        toneMapped={false}
-      />
-    </points>
+    <instancedMesh ref={meshRef} args={[undefined, undefined, particleCount]} frustumCulled={false}>
+      <sphereGeometry args={[1, 6, 6]} />
+      <meshBasicMaterial vertexColors toneMapped={false} />
+    </instancedMesh>
   );
 }
 
