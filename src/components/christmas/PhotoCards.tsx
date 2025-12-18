@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { TreeState, PhotoCard } from '@/types/christmas';
+import { RoundedBox } from '@react-three/drei';
 
 // Default placeholder images - higher resolution for clarity
 const DEFAULT_PHOTOS = [
@@ -168,11 +169,31 @@ function PhotoCardMesh({
     }
   });
 
+  // 创建圆角矩形几何体
+  const roundedRectGeometry = useMemo(() => {
+    const width = 1;
+    const height = 1;
+    const radius = 0.1; // 圆角半径
+    
+    const shape = new THREE.Shape();
+    shape.moveTo(-width/2 + radius, -height/2);
+    shape.lineTo(width/2 - radius, -height/2);
+    shape.quadraticCurveTo(width/2, -height/2, width/2, -height/2 + radius);
+    shape.lineTo(width/2, height/2 - radius);
+    shape.quadraticCurveTo(width/2, height/2, width/2 - radius, height/2);
+    shape.lineTo(-width/2 + radius, height/2);
+    shape.quadraticCurveTo(-width/2, height/2, -width/2, height/2 - radius);
+    shape.lineTo(-width/2, -height/2 + radius);
+    shape.quadraticCurveTo(-width/2, -height/2, -width/2 + radius, -height/2);
+    
+    const geometry = new THREE.ShapeGeometry(shape);
+    return geometry;
+  }, []);
+
   if (!texture) return null;
 
   return (
-    <mesh ref={meshRef} position={treePosition} scale={[0.5, 0.5, 1]}>
-      <planeGeometry args={[1, 1]} />
+    <mesh ref={meshRef} position={treePosition} scale={[0.5, 0.5, 1]} geometry={roundedRectGeometry}>
       <meshBasicMaterial 
         map={texture} 
         side={THREE.DoubleSide}
