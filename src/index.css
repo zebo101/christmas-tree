@@ -6,94 +6,99 @@
 
 @layer base {
   :root {
-    --background: 220 30% 8%;
-    --foreground: 45 20% 95%;
+    /* Trump-style luxury: Deep Emerald + High-gloss Gold */
+    --background: 160 30% 5%;
+    --foreground: 43 50% 90%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 45 20% 95%;
+    --card: 160 25% 8%;
+    --card-foreground: 43 50% 90%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 45 20% 95%;
+    --popover: 160 25% 8%;
+    --popover-foreground: 43 50% 90%;
 
-    --primary: 130 50% 25%;
-    --primary-foreground: 45 20% 95%;
+    /* Deep Emerald Green - Primary */
+    --primary: 160 70% 18%;
+    --primary-foreground: 43 50% 95%;
 
-    --secondary: 45 80% 55%;
-    --secondary-foreground: 220 30% 8%;
+    /* High-gloss Gold - Secondary */
+    --secondary: 43 90% 50%;
+    --secondary-foreground: 160 30% 5%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 60%;
+    --muted: 160 20% 12%;
+    --muted-foreground: 160 10% 55%;
 
-    --accent: 0 70% 45%;
-    --accent-foreground: 45 20% 95%;
+    /* Rich Gold Accent */
+    --accent: 43 100% 45%;
+    --accent-foreground: 160 30% 5%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 45 80% 55%;
+    --border: 160 20% 15%;
+    --input: 160 20% 15%;
+    --ring: 43 90% 50%;
 
     --radius: 0.75rem;
 
-    /* Christmas specific colors */
-    --christmas-green: 130 50% 25%;
-    --christmas-gold: 45 80% 55%;
+    /* Luxury Christmas colors */
+    --christmas-green: 160 70% 18%;
+    --christmas-gold: 43 90% 50%;
     --christmas-red: 0 70% 45%;
-    --christmas-deep-blue: 220 60% 12%;
-    --christmas-snow: 200 30% 95%;
+    --christmas-deep-blue: 160 60% 8%;
+    --christmas-snow: 43 30% 95%;
     
-    /* Glow effects */
-    --glow-gold: 45 100% 60%;
-    --glow-green: 130 60% 40%;
+    /* Cinematic glow effects */
+    --glow-gold: 43 100% 65%;
+    --glow-green: 160 80% 35%;
 
-    --sidebar-background: 220 25% 10%;
-    --sidebar-foreground: 45 20% 95%;
-    --sidebar-primary: 45 80% 55%;
-    --sidebar-primary-foreground: 220 30% 8%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 45 20% 95%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 45 80% 55%;
+    --sidebar-background: 160 25% 6%;
+    --sidebar-foreground: 43 50% 90%;
+    --sidebar-primary: 43 90% 50%;
+    --sidebar-primary-foreground: 160 30% 5%;
+    --sidebar-accent: 160 20% 12%;
+    --sidebar-accent-foreground: 43 50% 90%;
+    --sidebar-border: 160 20% 15%;
+    --sidebar-ring: 43 90% 50%;
   }
 
   .dark {
-    --background: 220 30% 8%;
-    --foreground: 45 20% 95%;
+    /* Trump-style luxury: Deep Emerald + High-gloss Gold */
+    --background: 160 30% 5%;
+    --foreground: 43 50% 90%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 45 20% 95%;
+    --card: 160 25% 8%;
+    --card-foreground: 43 50% 90%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 45 20% 95%;
+    --popover: 160 25% 8%;
+    --popover-foreground: 43 50% 90%;
 
-    --primary: 130 50% 25%;
-    --primary-foreground: 45 20% 95%;
+    --primary: 160 70% 18%;
+    --primary-foreground: 43 50% 95%;
 
-    --secondary: 45 80% 55%;
-    --secondary-foreground: 220 30% 8%;
+    --secondary: 43 90% 50%;
+    --secondary-foreground: 160 30% 5%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 60%;
+    --muted: 160 20% 12%;
+    --muted-foreground: 160 10% 55%;
 
-    --accent: 0 70% 45%;
-    --accent-foreground: 45 20% 95%;
+    --accent: 43 100% 45%;
+    --accent-foreground: 160 30% 5%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 45 80% 55%;
+    --border: 160 20% 15%;
+    --input: 160 20% 15%;
+    --ring: 43 90% 50%;
 
-    --sidebar-background: 220 25% 10%;
-    --sidebar-foreground: 45 20% 95%;
-    --sidebar-primary: 45 80% 55%;
-    --sidebar-primary-foreground: 220 30% 8%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 45 20% 95%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 45 80% 55%;
+    --sidebar-background: 160 25% 6%;
+    --sidebar-foreground: 43 50% 90%;
+    --sidebar-primary: 43 90% 50%;
+    --sidebar-primary-foreground: 160 30% 5%;
+    --sidebar-accent: 160 20% 12%;
+    --sidebar-accent-foreground: 43 50% 90%;
+    --sidebar-border: 160 20% 15%;
+    --sidebar-ring: 43 90% 50%;
   }
 }
 

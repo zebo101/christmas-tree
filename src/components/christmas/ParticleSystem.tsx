@@ -105,20 +105,31 @@ export function ParticleSystem({ state, particleCount = 15000 }: ParticleSystemP
       positions[i * 3 + 1] = treePos[1];
       positions[i * 3 + 2] = treePos[2];
       
-      // 85% green, 15% white sparkles
+      // 70% deep emerald, 25% gold highlights, 5% bright gold sparkles
       const colorRand = Math.random();
-      if (colorRand < 0.85) {
-        const hue = 0.33 + Math.random() * 0.05;
-        const saturation = 0.7 + Math.random() * 0.3;
-        const lightness = 0.25 + Math.random() * 0.2;
+      if (colorRand < 0.70) {
+        // Deep emerald green (Trump luxury style)
+        const hue = 0.44 + Math.random() * 0.03; // 158-170 degrees
+        const saturation = 0.6 + Math.random() * 0.3;
+        const lightness = 0.12 + Math.random() * 0.12;
+        const color = new THREE.Color().setHSL(hue, saturation, lightness);
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+      } else if (colorRand < 0.95) {
+        // High-gloss gold highlights
+        const hue = 0.12 + Math.random() * 0.02; // 43-50 degrees
+        const saturation = 0.85 + Math.random() * 0.15;
+        const lightness = 0.45 + Math.random() * 0.15;
         const color = new THREE.Color().setHSL(hue, saturation, lightness);
         colors[i * 3] = color.r;
         colors[i * 3 + 1] = color.g;
         colors[i * 3 + 2] = color.b;
       } else {
-        colors[i * 3] = 0.95;
-        colors[i * 3 + 1] = 0.95;
-        colors[i * 3 + 2] = 0.95;
+        // Bright gold sparkles for luxury glow
+        colors[i * 3] = 1.0;
+        colors[i * 3 + 1] = 0.84;
+        colors[i * 3 + 2] = 0.0;
       }
       
       data.push({
@@ -239,10 +250,11 @@ export function GiftBoxes({ state }: { state: TreeState }) {
   const giftCount = 15;
   
   const giftData = useMemo(() => {
+    // Trump-style luxury gift colors: Deep emerald + Gold
     const giftStyles = [
-      { box: '#C41E3A', ribbon: '#FFD700' },  // Red box + Gold ribbon
-      { box: '#228B22', ribbon: '#C41E3A' },  // Green box + Red ribbon
-      { box: '#FFD700', ribbon: '#C41E3A' },  // Gold box + Red ribbon
+      { box: '#0d5c3a', ribbon: '#ffd700' },  // Deep emerald + Gold
+      { box: '#daa520', ribbon: '#0a4025' },  // Goldenrod + Dark emerald
+      { box: '#0a4025', ribbon: '#ffc125' },  // Dark emerald + Bright gold
     ];
     
     return Array.from({ length: giftCount }, (_, i) => {
@@ -325,7 +337,7 @@ export function GiftBoxes({ state }: { state: TreeState }) {
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial toneMapped={false} />
       </instancedMesh>
-      {/* Gold ribbons */}
+      {/* Luxury gold ribbons */}
       <instancedMesh ref={ribbonRef} args={[undefined, undefined, giftCount]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial color="#FFD700" toneMapped={false} />
@@ -347,11 +359,15 @@ export function GemOrnaments({ state }: { state: TreeState }) {
   
   const cubeData = useMemo(() => {
     return Array.from({ length: cubeCount }, (_, i) => {
-      const hue = Math.random() > 0.5 ? 0.75 + Math.random() * 0.1 : 0;
+      // Alternate between gold and emerald gems
+      const isGold = Math.random() > 0.4;
+      const hue = isGold ? 0.12 + Math.random() * 0.02 : 0.44 + Math.random() * 0.03;
+      const saturation = isGold ? 0.9 : 0.7;
+      const lightness = isGold ? 0.55 + Math.random() * 0.1 : 0.25 + Math.random() * 0.1;
       return {
         treePosition: generateOrnamentPosition(i, cubeCount),
         galaxyPosition: generateGalaxyPosition(),
-        color: new THREE.Color().setHSL(hue, hue > 0 ? 0.4 : 0, 0.85 + Math.random() * 0.15),
+        color: new THREE.Color().setHSL(hue, saturation, lightness),
         scale: 0.05 + Math.random() * 0.04,
         rotSpeed: 0.3 + Math.random() * 0.5,
         delay: Math.random(),
@@ -361,11 +377,15 @@ export function GemOrnaments({ state }: { state: TreeState }) {
   
   const icoData = useMemo(() => {
     return Array.from({ length: icoCount }, (_, i) => {
-      const hue = Math.random() > 0.5 ? 0.78 + Math.random() * 0.05 : 0;
+      // Mostly bright gold for icosahedrons (gem-like)
+      const isGold = Math.random() > 0.3;
+      const hue = isGold ? 0.12 : 0.44;
+      const saturation = isGold ? 0.95 : 0.6;
+      const lightness = isGold ? 0.6 + Math.random() * 0.15 : 0.3 + Math.random() * 0.1;
       return {
         treePosition: generateOrnamentPosition(i + cubeCount, icoCount + cubeCount),
         galaxyPosition: generateGalaxyPosition(),
-        color: new THREE.Color().setHSL(hue, hue > 0 ? 0.5 : 0, 0.8 + Math.random() * 0.2),
+        color: new THREE.Color().setHSL(hue, saturation, lightness),
         scale: 0.06 + Math.random() * 0.05,
         rotSpeed: 0.2 + Math.random() * 0.4,
         delay: Math.random(),
@@ -455,11 +475,11 @@ export function GemOrnaments({ state }: { state: TreeState }) {
     <>
       <instancedMesh ref={cubeRef} args={[undefined, undefined, cubeCount]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#f8f8ff" toneMapped={false} />
+        <meshBasicMaterial color="#ffd700" toneMapped={false} />
       </instancedMesh>
       <instancedMesh ref={icoRef} args={[undefined, undefined, icoCount]}>
         <icosahedronGeometry args={[1, 0]} />
-        <meshBasicMaterial color="#f8f8ff" toneMapped={false} />
+        <meshBasicMaterial color="#ffd700" toneMapped={false} />
       </instancedMesh>
     </>
   );
@@ -473,7 +493,7 @@ export function TetrahedronSpiral({ state }: { state: TreeState }) {
   const colorsSetRef = useRef(false);
   const transitionRef = useRef({ progress: 0 });
   const tetraCount = 180;
-  const whiteColor = useMemo(() => new THREE.Color('#ffffff'), []);
+  const goldColor = useMemo(() => new THREE.Color('#ffd700'), []);
   
   const tetraData = useMemo(() => {
     return Array.from({ length: tetraCount }, (_, i) => {
@@ -510,10 +530,10 @@ export function TetrahedronSpiral({ state }: { state: TreeState }) {
   // Set colors once
   useEffect(() => {
     if (!meshRef.current || colorsSetRef.current) return;
-    tetraData.forEach((_, i) => meshRef.current!.setColorAt(i, whiteColor));
+    tetraData.forEach((_, i) => meshRef.current!.setColorAt(i, goldColor));
     if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
     colorsSetRef.current = true;
-  }, [tetraData, whiteColor]);
+  }, [tetraData, goldColor]);
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
