@@ -70,7 +70,7 @@ function CameraController({
     if (state === 'tree' && transitionDelayRef.current <= 0) {
       if (!isAtStarRef.current) {
         // Ribbon follow mode - camera spirals from bottom to top following the ribbon
-        ribbonTimeRef.current += delta * 0.15; // Speed of spiral
+        ribbonTimeRef.current += delta * 0.1; // Slower for silkier feel
         
         // Check if reached the top (t >= 1)
         if (ribbonTimeRef.current >= 1) {
@@ -79,7 +79,11 @@ function CameraController({
           ribbonTimeRef.current = 1;
         }
         
-        const t = Math.min(ribbonTimeRef.current, 1);
+        // Apply easeInOutCubic for silky smooth progression
+        const rawT = Math.min(ribbonTimeRef.current, 1);
+        const t = rawT < 0.5 
+          ? 4 * rawT * rawT * rawT 
+          : 1 - Math.pow(-2 * rawT + 2, 3) / 2;
         
         // Match ribbon spiral parameters from TetrahedronSpiral
         const height = 7;
@@ -114,8 +118,8 @@ function CameraController({
       targetZ = Math.cos(orbitRotation.y) * baseDistance;
     }
     
-    // Frame-rate independent smooth camera movement
-    const smoothFactor = 1 - Math.exp(-3 * delta);
+    // Frame-rate independent smooth camera movement (silkier lerp)
+    const smoothFactor = 1 - Math.exp(-1.8 * delta);
     
     positionRef.current.x += (targetX - positionRef.current.x) * smoothFactor;
     positionRef.current.y += (targetY - positionRef.current.y) * smoothFactor;
