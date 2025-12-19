@@ -43,7 +43,7 @@ export function CustomTextOverlay({ isVisible, text, onTextChange }: CustomTextO
         className={`fixed inset-0 flex items-start justify-center pointer-events-none z-20 pt-[23vh]`}
       >
         <div 
-          className="text-center px-8 transition-all duration-[3500ms] ease-out"
+          className="text-center px-8 transition-all duration-[5000ms] ease-out"
           style={{
             opacity: showText ? 1 : 0,
             transform: showText 
@@ -68,7 +68,7 @@ export function CustomTextOverlay({ isVisible, text, onTextChange }: CustomTextO
           <Button
             variant="outline"
             size="icon"
-            className="fixed bottom-12 right-4 z-30 glass border-white/20 hover:bg-white/10 text-foreground"
+            className="fixed bottom-16 right-4 z-30 bg-neutral-800/80 border-white/20 hover:bg-neutral-700/80 text-foreground"
           >
             <Edit3 className="h-4 w-4" />
           </Button>
