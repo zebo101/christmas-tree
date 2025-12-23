@@ -27,7 +27,7 @@ const generatePlaceholder = (index: number): string => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 400, 400);
     
-    const emojis = ['🎄', '⭐', '🎁', '❄️', '🔔', '🎅', '🦌', '🕯️', '🍪', '🧦'];
+    const emojis = ['王', '⭐', '🎁', '❄️', '🔔', '🎅', '🦌', '🕯️', '🍪', '🧦'];
     ctx.font = '120px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
